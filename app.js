@@ -3,9 +3,9 @@ const Promise = require('bluebird')
 var express = Promise.promisifyAll (require('express'));
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+var auth = require('./middleware/auth')
 var indexRouter = require('./routes/index');
-
+require('dotenv').config();
 var app = express();
 
 

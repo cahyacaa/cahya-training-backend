@@ -10,6 +10,7 @@ module.exports = {
       email :'cahya@skyshi.com',
       gender:'Male',
       phonenumber:'+6281340883',
+      password:'default',
       createdAt : new Date(),
       updatedAt : new Date(),
     }], {});
