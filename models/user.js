@@ -7,20 +7,23 @@ module.exports = (sequelize, DataTypes) => {
   class user extends Model {
     static associate(models) {
       // define association here
-    }
+        user.belongsTo(models.role, {
+          foreignKey: 'roleID',
+        })
+      }
   };
   user.init({
     name: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [2,20]
+        len: [2, 20]
       }
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique:true,
+      unique: true,
       validate: {
         isEmail: true,
       }
@@ -30,7 +33,9 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         isIn: {
-          args: [['male', 'female','Male', 'Female']],
+          args: [
+            ['male', 'female', 'Male', 'Female']
+          ],
           msg: "Must be Male or Female"
         }
       }
@@ -42,9 +47,13 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate:{
-        len:[1,255]
+      validate: {
+        len: [1, 255]
       }
+    },
+    password: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
   }, {
     sequelize,

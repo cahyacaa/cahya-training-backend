@@ -8,9 +8,10 @@ module.exports = {
     await queryInterface.bulkInsert('users', [{
       name: 'Cahya Nugroho',
       email :'cahya@skyshi.com',
-      gender:'Male',
+      gender:'male',
       phonenumber:'+6281340883',
-      password:'default',
+      password:'$2b$10$DB.w1gHkosYLRCpI36UeMuQpa5ev4fYAYLHXqYpvyLvbQGYsMxzna',
+      roleID:0,
       createdAt : new Date(),
       updatedAt : new Date(),
     }], {});
@@ -23,5 +24,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
+     await queryInterface.bulkDelete('users', null, {});
   }
 };

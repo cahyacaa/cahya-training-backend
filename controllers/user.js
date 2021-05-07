@@ -12,6 +12,7 @@ module.exports = {
   list(req, res) {
     User
       .findAll({
+        include:['role'],
         attributes: {
           exclude: ['createdAt', 'updatedAt']
         },
@@ -101,6 +102,9 @@ module.exports = {
       phonenumber,
       password
     } = req.body
+    if(!password){
+      return response(res,400,'password invalid')
+    }
     const salt = bcrypt.genSaltSync(10)
     const encryptPassword = bcrypt.hashSync(password, salt)
     const data = {
@@ -127,7 +131,6 @@ module.exports = {
         return error
       })
     if (!checkExisting && typeof email != 'undefined') {
-      console.log(data)
       await User
         .create(data)
         .then((users) => {
@@ -146,13 +149,15 @@ module.exports = {
       name,
       email,
       gender,
-      phonenumber
+      phonenumber,
+      roleID
     } = req.body
     const data = {
       name,
       email,
       gender,
-      phonenumber
+      phonenumber,
+      roleID
     }
     User
       .findByPk(req.params.id)
@@ -173,6 +178,23 @@ module.exports = {
   },
 
   delete(req, res) {
+    User
+      .findByPk(req.params.id)
+      .then(user => {
+        if (!user) {
+          return res.status(400).send({
+            message: 'User Not Found',
+          });
+        }
+        return user
+          .destroy()
+          .then(() => res.status(204).send())
+          .catch((error) => res.status(400).send(error));
+      })
+      .catch((error) => res.status(400).send(error));
+  },
+
+  logout(req, res) {
     User
       .findByPk(req.params.id)
       .then(user => {

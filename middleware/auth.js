@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken')
 const {
   response
 } = require('../helper/response')
+const Promise = require('bluebird') 
+
 
 module.exports = {
   authorization: (req, res, next) => {
