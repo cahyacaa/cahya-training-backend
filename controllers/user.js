@@ -6,13 +6,15 @@ const User = Promise.promisifyAll((require('../models'))).user;
 const bcrypt = require('bcrypt');
 const jwt = Promise.promisifyAll(require('jsonwebtoken'));
 require('dotenv').config()
-
+const {
+  decodeToken
+} = require('../module/jwtDecode');
 
 module.exports = {
   list(req, res) {
     User
       .findAll({
-        include:['role'],
+        include: ['role'],
         attributes: {
           exclude: ['createdAt', 'updatedAt']
         },
@@ -65,15 +67,18 @@ module.exports = {
               name,
               email,
               phonenumber,
+              roleID,
+              activeStatus
             } = user
             const payload = {
               id,
               name,
               email,
               phonenumber,
+              roleID,
+              activeStatus
             }
-            console.log(process.env.SECRET_KEY)
-            const token = jwt.sign(payload, process.env.SECRET_KEY , {
+            const token = jwt.sign(payload, process.env.SECRET_KEY, {
               expiresIn: '3h'
             })
             const result = {
@@ -100,10 +105,12 @@ module.exports = {
       email,
       gender,
       phonenumber,
-      password
+      password,
+      roleID,
+      activeStatus
     } = req.body
-    if(!password){
-      return response(res,400,'password invalid')
+    if (!password) {
+      return response(res, 400, 'password must not be null')
     }
     const salt = bcrypt.genSaltSync(10)
     const encryptPassword = bcrypt.hashSync(password, salt)
@@ -112,7 +119,14 @@ module.exports = {
       email,
       gender,
       phonenumber,
-      password: encryptPassword
+      password: encryptPassword,
+      roleID,
+      activeStatus
+    }
+    if (!req.body.roleID) {
+      Object.assign(data, {
+        roleID: "user"
+      })
     }
     checkExisting = await User
       .findOne({
@@ -134,7 +148,7 @@ module.exports = {
       await User
         .create(data)
         .then((users) => {
-          return response(res, 200, 'success', users)
+          return response(res, 200, 'success')
         })
         .catch((error) => {
           return response(res, 500, 'error', error)
@@ -212,10 +226,7 @@ module.exports = {
   },
 
   getUserProfile(req, res) {
-    let token = req.headers.authorization;
-    token = token.split(' ');
-    token = token[1];
-    const data = jwt.decode(token);
+    const data = decodeToken(req)
     User
       .findOne({
         where: {
@@ -231,5 +242,37 @@ module.exports = {
         }
       })
       .catch((error) => res.status(400).send(error));
+  },
+
+  updateProfile(req, res) {
+    const userData=decodeToken(req)
+    const {
+      name,
+      email,
+      gender,
+      phonenumber
+    } = req.body
+    const data = {
+      name,
+      gender,
+      email,
+      phonenumber
+    }
+    User
+      .findOne({where:{email:userData.email}})
+      .then(user => {
+        if (!user) {
+          return res.status(404).send({
+            message: 'User Not Found',
+          });
+        }
+        return user
+          .update(
+            data
+          )
+          .then((users) => response(res, 200, 'success', users))
+          .catch((error) => response(res,500,error));
+      })
+      .catch((error) => response(res,500,error));
   }
 };

@@ -6,7 +6,8 @@ const {
 } = require('../controllers');
 
 const {
-  authorization
+  authorization,
+  authentication
 } = require('../middleware/auth')
 
 
@@ -26,24 +27,26 @@ express.application.prefix = express.Router.prefix = function (path, configure) 
 
 
 router.prefix('/v1', function (router) {
+  
   // user api
-  router.get('/user/profile', authorization, user.getUserProfile);
-  router.get('/user', authorization, user.list);
-  router.get('/user/:id', authorization, user.getById);
-  router.post('/user', user.add);
-  router.put('/user/:id', authorization, user.update);
-  router.delete('/user/:id', authorization, user.delete);
+  router.get('/user/profile',authorization, user.getUserProfile);
+  router.get('/user', authorization, authentication, user.list);
+  router.get('/user/:id', authorization, authentication, user.getById);
+  router.post('/user/register', user.add);
+  router.put('/user/profile', authorization, user.updateProfile);
+  router.put('/user/:id', authorization, authentication, user.update);
+  router.delete('/user/:id', authorization, authentication, user.delete);
 
   // session api
   router.post('/user/login', user.login);
   router.post('/user/logout', user.logout);
 
   // role api
-  router.post('/role', role.add);
-  router.get('/role', role.list);
-  router.get('/role/:id', role.getById);
-  router.put('/role/:id', role.update);
-  router.delete('/role/:id', role.delete);
+  router.post('/role', authentication, role.add);
+  router.get('/role', authentication, role.list);
+  router.get('/role/:id', authentication, role.getById);
+  router.put('/role/:id', authentication, role.update);
+  router.delete('/role/:id', authentication, role.delete);
 })
 
 module.exports = router;

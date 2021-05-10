@@ -11,7 +11,8 @@ module.exports = {
       gender:'male',
       phonenumber:'+6281340883',
       password:'$2b$10$DB.w1gHkosYLRCpI36UeMuQpa5ev4fYAYLHXqYpvyLvbQGYsMxzna',
-      roleID:0,
+      roleID:'admin',
+      activeStatus:true,
       createdAt : new Date(),
       updatedAt : new Date(),
     }], {});

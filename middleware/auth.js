@@ -2,8 +2,10 @@ const jwt = require('jsonwebtoken')
 const {
   response
 } = require('../helper/response')
-const Promise = require('bluebird') 
-
+const User = require('../models').user
+const {
+  decodeToken
+} = require('../module/jwtDecode')
 
 module.exports = {
   authorization: (req, res, next) => {
@@ -30,14 +32,27 @@ module.exports = {
     }
   },
   authentication: (req, res, next) => {
-    if (req.decodetoken.users_role === 0) {
-      return response(
-        res,
-        400,
-        'Not Allowed ! Page accessible by admin only'
-      )
-    } else {
-      next()
-    }
+    const data = decodeToken(req)
+    User
+      .findOne({
+        where: {
+          id: data.id
+        },
+        attributes: ['id', "roleID", 'activeStatus']
+      })
+      .then((role) => {
+        if (role.roleID != 'admin' || !role.activeStatus) {
+          return response(
+            res,
+            '403',
+            'Not Allowed ! Page accessible by admin and active user only'
+          )
+        } else {
+          next()
+        }
+      })
+      .catch((error) => {
+        response(res, 500, error)
+      })
   }
 }

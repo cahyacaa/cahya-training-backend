@@ -7,10 +7,10 @@ module.exports = (sequelize, DataTypes) => {
   class user extends Model {
     static associate(models) {
       // define association here
-        user.belongsTo(models.role, {
-          foreignKey: 'roleID',
-        })
-      }
+      user.belongsTo(models.role, {
+        foreignKey: 'roleID',
+      })
+    }
   };
   user.init({
     name: {
@@ -53,6 +53,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    activeStatus: {
+      type: DataTypes.BOOLEAN,
+      defaultValue:true,
       allowNull: false,
     },
   }, {
